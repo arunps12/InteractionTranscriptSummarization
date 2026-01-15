@@ -209,3 +209,5 @@ __marimo__/
 #file
 *.csv
 *.zip
+# artifact files
+artifacts/
