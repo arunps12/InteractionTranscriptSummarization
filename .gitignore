@@ -211,3 +211,9 @@ __marimo__/
 *.zip
 # artifact files
 artifacts/
+
+# Exclude docs directory but keep specific documentation files
+docs/*
+!docs/refactor_report.md
+!docs/assumptions.md
+!docs/interaction_transcript_summarization_README_AWS_GHA_HFHub.md

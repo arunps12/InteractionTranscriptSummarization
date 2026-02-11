@@ -1,14 +1,32 @@
 artifacts_root: artifacts
 
-
 data_ingestion:
   root_dir: artifacts/data_ingestion
-  source_URL: https://github.com/arunps12/datasets/raw/main/summarizer-data.zip
-  local_data_file: artifacts/data_ingestion/data.zip
-  unzip_dir: artifacts/data_ingestion
+  dataset_name: samsum
+  raw_data_path: artifacts/data_ingestion/samsum_dataset
 
-
+data_validation:
+  root_dir: artifacts/data_validation
+  data_path: artifacts/data_ingestion/samsum_dataset
+  
 data_transformation:
   root_dir: artifacts/data_transformation
   data_path: artifacts/data_ingestion/samsum_dataset
+  tokenizer_name: google/pegasus-cnn_dailymail
+
+model_trainer:
+  root_dir: artifacts/model_trainer
+  data_path: artifacts/data_transformation/samsum_dataset
+  model_ckpt: google/pegasus-cnn_dailymail
+  model_best_path: artifacts/model_trainer/model_best
+  model_last_path: artifacts/model_trainer/model_last
+
+model_evaluation:
+  root_dir: artifacts/model_evaluation
+  model_path: artifacts/model_trainer/model_best
+  data_path: artifacts/data_transformation/samsum_dataset
+  tokenizer_name: google/pegasus-cnn_dailymail
+
+model_pusher:
+  model_path: artifacts/model_trainer/model_best
   tokenizer_name: google/pegasus-cnn_dailymail
