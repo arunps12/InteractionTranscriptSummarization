@@ -1,0 +1,67 @@
+stages:
+  data_ingestion:
+    cmd: uv run python main.py 1
+    deps:
+      - src/interaction_transcript_summarization/components/data_ingestion.py
+      - src/interaction_transcript_summarization/pipeline/stage_1_data_ingestion_pipeline.py
+      - config/config.yaml
+    outs:
+      - artifacts/data_ingestion/samsum_dataset
+      - artifacts/data_ingestion/data_manifest.yaml
+
+  data_validation:
+    cmd: uv run python main.py 2
+    deps:
+      - src/interaction_transcript_summarization/components/data_validation.py
+      - src/interaction_transcript_summarization/pipeline/stage_2_data_validation_pipeline.py
+      - config/config.yaml
+      - artifacts/data_ingestion/samsum_dataset
+    outs:
+      - artifacts/data_validation/validation_report.yaml
+
+  data_transformation:
+    cmd: uv run python main.py 3
+    deps:
+      - src/interaction_transcript_summarization/components/data_transformation.py
+      - src/interaction_transcript_summarization/pipeline/stage_2_data_transformation_pipeline.py
+      - config/config.yaml
+      - artifacts/data_ingestion/samsum_dataset
+    outs:
+      - artifacts/data_transformation/samsum_dataset
+      - artifacts/data_transformation/training_manifest.yaml
+
+  model_trainer:
+    cmd: uv run python main.py 4
+    deps:
+      - src/interaction_transcript_summarization/components/model_trainer.py
+      - src/interaction_transcript_summarization/pipeline/stage_4_model_trainer_pipeline.py
+      - config/config.yaml
+      - params.yaml
+      - artifacts/data_transformation/samsum_dataset
+    params:
+      - TrainingArguments
+    outs:
+      - artifacts/model_trainer/model_best
+      - artifacts/model_trainer/model_last
+      - artifacts/model_trainer/training_report.yaml
+
+  model_evaluation:
+    cmd: uv run python main.py 5
+    deps:
+      - src/interaction_transcript_summarization/components/model_evaluation.py
+      - src/interaction_transcript_summarization/pipeline/stage_5_model_evaluation_pipeline.py
+      - config/config.yaml
+      - artifacts/model_trainer/model_best
+      - artifacts/data_transformation/samsum_dataset
+    outs:
+      - artifacts/model_evaluation/evaluation_report.yaml
+
+  model_pusher:
+    cmd: uv run python main.py 6
+    deps:
+      - src/interaction_transcript_summarization/components/model_pusher.py
+      - src/interaction_transcript_summarization/pipeline/stage_6_model_pusher_pipeline.py
+      - config/config.yaml
+      - artifacts/model_trainer/model_best
+    outs:
+      - artifacts/model_pusher/push_report.yaml

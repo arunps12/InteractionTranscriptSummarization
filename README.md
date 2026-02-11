@@ -1,16 +1,25 @@
 # Interaction Transcript Summarization
 
-![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red)
-![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-yellow)
-![PEGASUS](https://img.shields.io/badge/Model-PEGASUS-blue)
-![SAMSum](https://img.shields.io/badge/Dataset-SAMSum-green)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
+[![PyTorch 2.x](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
+[![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/transformers)
+[![PEGASUS](https://img.shields.io/badge/Model-PEGASUS-blue?logo=google&logoColor=white)](https://huggingface.co/google/pegasus-cnn_dailymail)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.78-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![DVC](https://img.shields.io/badge/DVC-Pipeline-13ADC7?logo=dvc&logoColor=white)](https://dvc.org)
+[![MLflow](https://img.shields.io/badge/MLflow-Tracking-0194E2?logo=mlflow&logoColor=white)](https://mlflow.org)
+[![DagsHub](https://img.shields.io/badge/DagsHub-Experiments-FF6F61)](https://dagshub.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://hub.docker.com)
+[![CI/CD](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![UV](https://img.shields.io/badge/UV-Package_Manager-DE5FE9?logo=astral&logoColor=white)](https://docs.astral.sh/uv)
+[![Dataset: SAMSum](https://img.shields.io/badge/Dataset-SAMSum-green)](https://huggingface.co/datasets/Samsung/samsum)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A production-ready, modular dialogue summarization system using fine-tuned PEGASUS on the SAMSum dataset, with complete MLOps pipeline including training, evaluation, deployment, and CI/CD.
 
-## 🎯 Features
+## Features
 
 - **Complete ML Pipeline**: 6-stage modular pipeline from data ingestion to model deployment
+- **DVC Integration**: Smart pipeline caching - only re-runs stages when dependencies change
 - **PEGASUS Fine-tuning**: State-of-the-art abstractive summarization
 - **MLflow Integration**: Comprehensive experiment tracking
 - **FastAPI Service**: REST API for inference with latency tracking
@@ -18,7 +27,7 @@ A production-ready, modular dialogue summarization system using fine-tuned PEGAS
 - **CI/CD**: GitHub Actions workflow with AWS deployment
 - **HuggingFace Hub**: Model registry and versioning
 
-## 📋 Pipeline Stages
+## Pipeline Stages
 
 ### Stage 1: Data Ingestion
 - Loads SAMSum dataset from HuggingFace
@@ -53,7 +62,7 @@ A production-ready, modular dialogue summarization system using fine-tuned PEGAS
 - Auto-generates model card
 - Environment-based authentication
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -62,12 +71,16 @@ A production-ready, modular dialogue summarization system using fine-tuned PEGAS
 git clone <repository-url>
 cd InteractionTranscriptSummarization
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-pip install -r requirements.txt
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -r requirements.txt
+
+# Initialize DVC
+dvc init
 
 # Set up environment variables
 cp .env.example .env
@@ -76,27 +89,47 @@ cp .env.example .env
 
 ### Running the Pipeline
 
+#### Using DVC (Recommended - Smart Caching)
+
+```bash
+# Run entire pipeline with DVC (only re-runs changed stages)
+uv run dvc repro
+
+# Run specific stage and its dependencies
+uv run dvc repro data_ingestion
+uv run dvc repro data_validation
+uv run dvc repro data_transformation
+uv run dvc repro model_trainer
+uv run dvc repro model_evaluation
+uv run dvc repro model_pusher
+
+# Force re-run a specific stage
+uv run dvc repro -f model_trainer
+```
+
+#### Using Python Directly
+
 ```bash
 # Run entire data pipeline (Stages 1-3)
-python main.py
+uv run python main.py
 
 # Run specific stages
-python main.py 1  # Data Ingestion
-python main.py 2  # Data Validation
-python main.py 3  # Data Transformation
-python main.py 4  # Model Training (requires GPU recommended)
-python main.py 5  # Model Evaluation
-python main.py 6  # Push to HuggingFace Hub
+uv run python main.py 1  # Data Ingestion
+uv run python main.py 2  # Data Validation
+uv run python main.py 3  # Data Transformation
+uv run python main.py 4  # Model Training (requires GPU recommended)
+uv run python main.py 5  # Model Evaluation
+uv run python main.py 6  # Push to HuggingFace Hub
 ```
 
 ### Running the API
 
 ```bash
 # Start the FastAPI server
-uvicorn app:app --reload
+uv run uvicorn app:app --reload
 
-# Or using Python
-python app.py
+# Or using Python directly
+uv run python app.py
 ```
 
 Visit `http://localhost:8000/docs` for interactive API documentation.
@@ -123,7 +156,7 @@ print(response.json())
 # }
 ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ```bash
 # Build the Docker image
@@ -136,7 +169,7 @@ docker run -p 8000:8000 \
   pegasus-summarizer
 ```
 
-## 📊 Project Structure
+## Project Structure
 
 ```
 ├── src/interaction_transcript_summarization/
@@ -154,6 +187,7 @@ docker run -p 8000:8000 \
 │   └── logging/             # Logging setup
 ├── config/
 │   └── config.yaml          # Pipeline configuration
+├── dvc.yaml                 # DVC pipeline definition
 ├── params.yaml              # Training hyperparameters
 ├── main.py                  # Pipeline runner
 ├── app.py                   # FastAPI application
@@ -162,7 +196,7 @@ docker run -p 8000:8000 \
 └── .github/workflows/       # CI/CD workflows
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables (.env)
 
@@ -182,7 +216,7 @@ TrainingArguments:
   fp16: true
 ```
 
-## 📈 Model Performance
+## Model Performance
 
 The fine-tuned model achieves:
 - **ROUGE-1**: ~0.47
@@ -191,17 +225,23 @@ The fine-tuned model achieves:
 
 *(Actual scores depend on training configuration)*
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run tests
-pytest tests/ -v
+uv run pytest tests/ -v
 
 # Run linting
-ruff check .
+uv run ruff check .
+
+# Check DVC pipeline status
+uv run dvc status
+
+# Visualize DVC pipeline DAG
+uv run dvc dag
 ```
 
-## 🚢 CI/CD Pipeline
+## CI/CD Pipeline
 
 The GitHub Actions workflow automatically:
 1. Runs linting (Ruff) and tests (pytest)
@@ -209,31 +249,31 @@ The GitHub Actions workflow automatically:
 3. Pushes to Amazon ECR
 4. Deploys to AWS (ECS/EC2)
 
-## 📝 License
+## License
 
 MIT License - see LICENSE file for details
 
-## 👤 Author
+## Author
 
 **Arun Prakash Singh**
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - HuggingFace for the Transformers library
 - Google for the PEGASUS model
 - SAMSum dataset creators
 - MLflow for experiment tracking
 
-## 📚 Documentation
+## Documentation
 
 - [Detailed Specification](docs/interaction_transcript_summarization_README_AWS_GHA_HFHub.md)
 - [Refactoring Report](docs/refactor_report.md)
 - [Assumptions](docs/assumptions.md)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📧 Contact
+## Contact
 
 For questions or support, please open an issue on GitHub.
