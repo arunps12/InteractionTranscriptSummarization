@@ -217,3 +217,4 @@ docs/*
 !docs/refactor_report.md
 !docs/assumptions.md
 !docs/interaction_transcript_summarization_README_AWS_GHA_HFHub.md
+!docs/IMPLEMENTATION_SUMMARY.md
