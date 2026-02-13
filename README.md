@@ -68,7 +68,7 @@ A production-ready, modular dialogue summarization system using fine-tuned PEGAS
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/arunps12/InteractionTranscriptSummarization.git
 cd InteractionTranscriptSummarization
 
 # Install uv (if not already installed)
